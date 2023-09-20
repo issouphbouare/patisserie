@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form id="form">
+		<div class="card crud-demo">
+			<p:growl id="messages" showDetail="true" />
+
+			<p:toolbar>
+				<p:toolbarGroup>
+					<!-- <p:commandButton icon="pi pi-arrow-left" title="Retour"
+						style="margin-right: .5rem"
+						styleClass="edit-button rounded-button ui-button-secondary"
+						update="content" process="manage-ligneAchat-content @this"
+						ajax="false">
+						<f:setPropertyActionListener value="#{achatBean.urlList}"
+							target="#{managerPageBean.page}" />
+					</p:commandButton> -->
+					<p:commandButton title="Nouvelle achat" icon="pi pi-plus"
+						actionListener="#{achatBean.openNew1}" style="margin-right: .5rem"
+						update=":form:manage-ligneAchat-content"
+						oncomplete="PF('manageLigneAchatDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success">
+						<p:resetInput target=":form:manage-ligneAchat-content" />
+					</p:commandButton>
+					<p:commandButton id="delete-ligneAchats-button" style=""
+						title="#{achatBean.deleteButtonMessage1}" icon="pi pi-trash"
+						actionListener="#{achatBean.deleteSelectedLigneAchats}"
+						styleClass="edit-button rounded-button ui-button-danger"
+						disabled="#{!achatBean.hasSelectedLigneAchats()}" update="@this">
+						<p:confirm header="Confirmation"
+							message="Voulez vous vraiment supprimer les ligneAchats selectionnés ?"
+							icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:spacer width="100px" />
+					<h3>ESPACE DE LIGNE COMMANDE POUR APPROVISIONNEMENT</h3>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+			<p:dataTable id="dt-ligneAchats" widgetVar="dtLigneAchats"
+				var="ligneAchat" value="#{achatBean.ligneAchats}" reflow="true"
+				styleClass="ligneAchats-table"
+				selection="#{achatBean.selectedLigneAchats}"
+				rowKey="#{ligneAchat.id}" paginator="true" rows="3"
+				rowSelectMode="add" paginatorPosition="bottom">
+				<f:facet name="header">
+					<div class="ligneAchats-table-header" align="left">
+						<p:outputLabel for="dateAchat">Date</p:outputLabel>
+						<p:inputText id="dateAchat"
+							value="#{achatBean.achatCourant.dateAchat}" disabled="true" />
+						<p:spacer width="100px" />
+
+						<p:outputLabel for="id">Achat N°</p:outputLabel>
+						<p:inputText id="id" value="#{achatBean.achatCourant.id}"
+							disabled="true" />
+						<p:spacer width="100px" />
+
+						<p:outputLabel for="fournisseur">Fournisseur </p:outputLabel>
+						<p:inputText id="fournisseur"
+							value="#{achatBean.achatCourant.fournisseur.libelle}"
+							disabled="true" />
+					</div>
+				</f:facet>
+
+				<p:ajax event="rowSelect" update=":form:delete-ligneAchats-button" />
+				<p:ajax event="rowUnselect" update=":form:delete-ligneAchats-button" />
+				<p:ajax event="rowSelectCheckbox"
+					update=":form:delete-ligneAchats-button" />
+				<p:ajax event="rowUnselectCheckbox"
+					update=":form:delete-ligneAchats-button" />
+				<p:ajax event="toggleSelect"
+					update=":form:delete-ligneAchats-button" />
+
+				<p:column selectionMode="multiple" exportable="false"></p:column>
+
+				<p:column headerText="Designation">
+					<h:outputText value="#{ligneAchat.matierePremiere.libelle}" />
+				</p:column>
+				<p:column headerText="Prix Unitaire">
+					<h:outputText value="#{ligneAchat.prixUnitaire}">
+						<f:convertNumber type="number" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Quantite">
+					<h:outputText value="#{ligneAchat.quantite}">
+						<f:convertNumber type="number" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Montant">
+					<h:outputText value="#{ligneAchat.montant}">
+						<f:convertNumber type="number" />
+					</h:outputText>
+				</p:column>
+
+
+				<p:column exportable="false">
+					<p:commandButton icon="pi pi-pencil" exportable="false"
+						update=":form:manage-ligneAchat-content"
+						oncomplete="PF('manageLigneAchatDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success"
+						process="@this">
+						<f:setPropertyActionListener value="#{ligneAchat}"
+							target="#{achatBean.selectedLigneAchat}" />
+						<p:resetInput target=":form:manage-ligneAchat-content" />
+					</p:commandButton>
+					<p:spacer width="5px" />
+					<p:commandButton class="ui-button-warning rounded-button"
+						exportable="false" icon="pi pi-trash" process="@this"
+						title="supprimer" oncomplete="PF('deleteLigneAchatDialog').show()">
+						<f:setPropertyActionListener value="#{ligneAchat}"
+							target="#{achatBean.selectedLigneAchat}" />
+					</p:commandButton>
+				</p:column>
+				<f:facet name="footer">
+					<div class="ligneAchats-table-header">
+						<p:outputLabel for="montant">Montant total  </p:outputLabel>
+						<p:inputNumber id="montant"
+							value="#{achatBean.achatCourant.montant}" disabled="true" />
+						<p:spacer width="100px" />
+
+						<p:outputLabel for="espece">Reglement Espece </p:outputLabel>
+						<p:inputText id="espece" value="#{achatBean.espece}">
+							<p:ajax event="input" update="rendu" />
+						</p:inputText>
+						<p:spacer width="100px" />
+
+						<p:outputLabel for="rendu">Rendu </p:outputLabel>
+						<p:inputNumber id="rendu"
+							value="#{achatBean.espece-achatBean.achatCourant.montant}"
+							disabled="true" />
+					</div>
+					<br />
+					<div class="ligneAchats-table-header" align="center">
+
+						<p:commandButton icon="pi pi-check" value="Valider l' achat"
+							style="margin-right: .5rem"
+							styleClass="edit-button rounded-button ui-button-success"
+							update="content" process="manage-ligneAchat-content @this"
+							ajax="false" actionListener="#{achatBean.confirmAchat}">
+							<f:setPropertyActionListener value="#{achatBean.urlList}"
+								target="#{managerPageBean.page}" />
+						</p:commandButton>
+
+						<p:spacer width="5px" />
+						<p:commandButton value="Annuler l'achat"
+							icon="pi pi-times" immediate="true"
+							styleClass="edit-button rounded-button ui-button-secondary" process="@this"
+							oncomplete="PF('deleteAchatDialog').show()">
+							<f:setPropertyActionListener value="#{achatBean.achatCourant}"
+								target="#{achatBean.selectedAchat}" />
+							<p:resetInput target=":form:manage-ligneAchat-content" />
+						</p:commandButton>
+					</div>
+				</f:facet>
+
+			</p:dataTable>
+
+
+			<p:dialog header="Details Ligne Achat" showEffect="fade" modal="true"
+				widgetVar="manageLigneAchatDialog" responsive="true">
+				<p:outputPanel id="manage-ligneAchat-content" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty achatBean.selectedLigneAchat}">
+						<div class="p-grid ui-fluid">
+							<div class="p-field p-col-12 p-md-4">
+								<h:outputLabel for="">Designation</h:outputLabel>
+								<BR />
+								<p:selectOneMenu converter="#{genericSecuredConverter}"
+									placeholder="Choisir le matierePremiere"
+									value="#{achatBean.selectedLigneAchat.matierePremiere}">
+									<f:selectItems value="#{matierePremiereBean.matierePremieres}" var="matierePremiere"
+										itemLabel="#{matierePremiere.libelle}" itemValue="#{matierePremiere}" />
+								</p:selectOneMenu>
+							</div>
+							<div class="p-field p-col-12 p-md-4">
+								<p:outputLabel for="prixUnitaire">Prix Unitaire</p:outputLabel>
+								<p:inputText id="prixUnitaire"
+									value="#{achatBean.selectedLigneAchat.prixUnitaire}" />
+							</div>
+							<div class="p-field p-col-12 p-md-4">
+								<p:outputLabel for="quantite">Quantite</p:outputLabel>
+								<p:inputText id="quantite"
+									value="#{achatBean.selectedLigneAchat.quantite}" />
+							</div>
+
+						</div>
+
+
+					</p:outputPanel>
+				</p:outputPanel>
+
+				<f:facet name="footer">
+					<p:commandButton value="Ajouter à l'achat" icon="pi pi-check"
+						actionListener="#{achatBean.saveLigneAchat}"
+						update="manage-ligneAchat-content"
+						process="manage-ligneAchat-content @this" />
+					<p:commandButton value="Annuler" icon="pi pi-times"
+						onclick="PF('manageLigneAchatDialog').hide()"
+						class="ui-button-secondary" />
+				</f:facet>
+			</p:dialog>
+
+			<p:confirmDialog widgetVar="deleteLigneAchatDialog" showEffect="fade"
+				width="300" message="Voulez vous vraiment supprimer cette ligne de Achat?"
+				header="Confirmation" severity="warn">
+				<p:commandButton value="Oui" icon="pi pi-check"
+					actionListener="#{achatBean.deleteLigneAchat}" process="@this"
+					oncomplete="PF('deleteLigneAchatDialog').hide()" />
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-button-secondary" icon="pi pi-times"
+					onclick="PF('deleteLigneAchatDialog').hide()" />
+			</p:confirmDialog>
+
+			<p:confirmDialog global="true" showEffect="fade" width="300">
+				<p:commandButton value="Oui" type="button"
+					styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-confirmdialog-no ui-button-secondary"
+					icon="pi pi-times" />
+			</p:confirmDialog>
+
+			<p:confirmDialog widgetVar="deleteAchatDialog" showEffect="fade"
+				width="300" message="Voulez vous vraiment annuler cet achat?"
+				header="Confirmation" severity="warn">
+				<p:commandButton value="Oui" icon="pi pi-check"
+					actionListener="#{achatBean.deleteAchat}" process="@this"
+					oncomplete="PF('deleteAchatDialog').hide()" ajax="false">
+					<f:setPropertyActionListener value="achats.xhtml"
+						target="#{managerPageBean.page}" />
+				</p:commandButton>
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-confirmdialog-no ui-button-secondary"
+					icon="pi pi-times" onclick="PF('deleteAchatDialog').hide()" />
+			</p:confirmDialog>
+		</div>
+	</h:form>
+</ui:composition>
+</html>

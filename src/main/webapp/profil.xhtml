@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form id="form">
+		<div class="card crud-demo">
+			<p:growl id="messages" showDetail="true" />
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton icon="pi pi-arrow-left" title="Retour" immediate="true"
+						styleClass="edit-button rounded-button ui-button-secondary"
+						update="content" process="manage-ligneVente-content @this"
+						ajax="false" style="margin-right: .5rem">
+						<f:setPropertyActionListener value="#{venteBean.urlList}"
+							target="#{managerPageBean.page}" />
+					</p:commandButton>
+					<p:commandButton title="Nouvel User" icon="pi pi-plus"
+						actionListener="#{usersBean.openNew}" rendered="false"
+						update=":form:manage-product-content"
+						oncomplete="PF('manageProductDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success"
+						style="margin-right: .5rem">
+						<p:resetInput target=":form:manage-product-content" />
+					</p:commandButton>
+					<p:commandButton id="delete-products-button" rendered="false"
+						title="#{usersBean.deleteButtonMessage}" icon="pi pi-trash"
+						actionListener="#{usersBean.deleteSelectedUsers}"
+						styleClass="edit-button rounded-button ui-button-danger"
+						style="margin-right: .5rem"
+						disabled="#{!usersBean.hasSelectedUsers()}" update="@this">
+						<p:confirm header="Confirmation"
+							message="Voulez vous vraiment supprimer les Users selectionnés ?"
+							icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:spacer width="100px"></p:spacer>
+					
+					<h3 align="right">PROFIL AGENT</h3>
+				</p:toolbarGroup>
+
+			</p:toolbar>
+
+			<p:dataTable id="dt-users" widgetVar="dtUsers" var="user"
+				value="#{usersBean.getUser(authBean.currentUser)}" reflow="true"
+				styleClass="domaines-table" selection="#{usersBean.selectedUsers}"
+				rowKey="#{user.id}" rowSelectMode="add" paginatorPosition="bottom">
+
+
+				<p:ajax event="rowSelect" update=":form:delete-products-button" />
+				<p:ajax event="rowUnselect" update=":form:delete-products-button" />
+				<p:ajax event="rowSelectCheckbox"
+					update=":form:delete-products-button" />
+				<p:ajax event="rowUnselectCheckbox"
+					update=":form:delete-products-button" />
+				<p:ajax event="toggleSelect" update=":form:delete-products-button" />
+
+				<p:column selectionMode="multiple" exportable="false"
+					rendered="false" />
+
+				<p:column headerText="Telephone" >
+					<h:outputText value="#{user.telephone}"  />
+				</p:column>
+				<p:column headerText="Identifiant" >
+					<h:outputText value="#{user.username}" />
+				</p:column>
+				<p:column headerText="Email" >
+					<h:outputText value="#{user.email}"  />
+				</p:column>
+				<p:column headerText="Role" >
+					<h:outputText value="#{user.role}"  />
+				</p:column>
+				<p:column headerText="Acces">
+					<h:outputText value="#{user.enabled}"  />
+				</p:column>
+				<p:column exportable="false" >
+					<p:commandButton icon="pi pi-pencil" style="margin-right: .5rem"
+						update=":form:manage-product-content" title="Modifier ton profil"
+						oncomplete="PF('manageProductDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success"
+						process="@this">
+						<f:setPropertyActionListener value="#{user}"
+							target="#{usersBean.selectedUser}" />
+						<p:resetInput target=":form:manage-product-content" />
+					</p:commandButton>
+					<p:commandButton class="ui-button-warning rounded-button" style="margin-right: .5rem"
+						icon="pi pi-trash" process="@this" title="supprimer ton compte"
+						oncomplete="PF('deleteProductDialog').show()">
+						<f:setPropertyActionListener value="#{user}"
+							target="#{usersBean.selectedUser}" />
+					</p:commandButton>
+					<p:commandButton icon="pi pi-key" 
+						update=":form:manage-modifierPassword-content" title="Changer ton mot de passe"
+						oncomplete="PF('manageModifierPasswordDialog').show()"
+						styleClass="edit-button rounded-button ui-button-secondary"
+						process="@this">
+						<f:setPropertyActionListener value="#{user}"
+							target="#{usersBean.selectedUser}" />
+						<p:resetInput target=":form:manage-modifierPassword-content" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+
+			<p:dialog header="Modification Profil" showEffect="fade" modal="true"
+				widgetVar="manageProductDialog" responsive="true">
+				<p:outputPanel id="manage-product-content" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty usersBean.selectedUser}">
+
+						<div class="p-field">
+							<p:outputLabel for="username">Identifiant</p:outputLabel>
+							<p:inputText id="username"
+								value="#{usersBean.selectedUser.username}" />
+						</div>
+						<div class="p-field">
+							<p:outputLabel for="telephone">Telephone</p:outputLabel>
+							<p:inputText id="telephone"
+								value="#{usersBean.selectedUser.telephone}" required="true" />
+						</div>
+						<div class="p-field">
+							<p:outputLabel for="email">Email</p:outputLabel>
+							<p:inputText id="email" value="#{usersBean.selectedUser.email}" />
+						</div>
+
+						<div class="p-field" hidden="true">
+							<h:outputLabel for="">Acces</h:outputLabel>
+							<BR />
+							<p:selectOneMenu value="#{usersBean.selectedUser.enabled}">
+								<f:selectItem itemLabel="false" itemValue="false" />
+								<f:selectItem itemLabel="true" itemValue="true" />
+							</p:selectOneMenu>
+						</div>
+
+						<div class="p-field">
+							<h:outputLabel for="" rendered="false">Role</h:outputLabel>
+							<BR />
+							<p:selectOneMenu rendered="false"
+								value="#{usersBean.selectedUser.role}">
+								<f:selectItem itemLabel="agent" itemValue="agent" />
+								<f:selectItem itemLabel="admin" itemValue="admin" />
+							</p:selectOneMenu>
+						</div>
+						<div class="p-field" hidden="true">
+							<p:outputLabel for="password" rendered="false">Mot de passe</p:outputLabel>
+							<p:inputText id="password" type="password" rendered="false"
+								value="#{usersDroitBean.selectedUser.password}" required="" />
+						</div>
+					</p:outputPanel>
+				</p:outputPanel>
+
+				<f:facet name="footer">
+					<p:commandButton value="Enregistrer" icon="pi pi-check"
+						actionListener="#{usersBean.saveUser}"
+						update="manage-product-content"
+						process="manage-product-content @this" />
+					<p:commandButton value="Annuler" icon="pi pi-times"
+						onclick="PF('manageProductDialog').hide()" immediate="true"
+						class="ui-button-secondary" />
+				</f:facet>
+			</p:dialog>
+			
+			<p:dialog header="Modification de mot de passe" showEffect="fade"
+						modal="true" widgetVar="manageModifierPasswordDialog"
+						responsive="true">
+						<p:outputPanel id="manage-modifierPassword-content"
+							class="ui-fluid">
+							<p:outputPanel rendered="#{not empty usersBean.selectedUser}">
+
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="username1">Identifiant</p:outputLabel>
+									<p:inputText id="username1"
+										value="#{usersBean.selectedUser.username}" />
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="telephone1">Telephone</p:outputLabel>
+									<p:inputText id="telephone1"
+										value="#{usersBean.selectedUser.telephone}" />
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="email1">Email</p:outputLabel>
+									<p:inputText id="email1"
+										value="#{usersBean.selectedUser.email}" />
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Acces</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{usersBean.selectedUser.enabled}">
+										<f:selectItem itemLabel="false" itemValue="false" />
+										<f:selectItem itemLabel="true" itemValue="true" />
+									</p:selectOneMenu>
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Role</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{usersBean.selectedUser.role}">
+										<f:selectItem itemLabel="agent" itemValue="agent" />
+										<f:selectItem itemLabel="admin" itemValue="admin" />
+									</p:selectOneMenu>
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="password1">Mot de passe</p:outputLabel>
+									<p:inputText id="password1" type="password"
+										value="#{usersBean.selectedUser.password}" required="" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="lastPass">Ancien mot de passe</p:outputLabel>
+									<p:inputText id="lastPass" type="password" value="#{usersBean.lastPass}"
+										required="" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="newPass">Nouveau mot de passe</p:outputLabel>
+									<p:inputText id="newPass" type="password" value="#{usersBean.newPass}"
+										required="true" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="confirmPass">Confirmation de mot de passe</p:outputLabel>
+									<p:inputText id="confirmPass" type="password" value="#{usersBean.confirmPass}"
+										required="" />
+										</div>
+							</p:outputPanel>
+						</p:outputPanel>
+
+						<f:facet name="footer">
+							<p:commandButton value="Enregistrer" icon="pi pi-check"
+								actionListener="#{usersBean.saveUserPassword}"
+								update="manage-modifierPassword-content"
+								process="manage-modifierPassword-content @this" />
+							<p:commandButton value="Annuler" icon="pi pi-times"
+								onclick="PF('manageModifierPasswordDialog').hide()"
+								immediate="true" class="ui-button-secondary" />
+						</f:facet>
+					</p:dialog>
+			
+
+			<p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade"
+				width="300"
+				message="Voulez vous vraiment supprimer votre Compte ?"
+				header="Confirmation" severity="warn">
+				<p:commandButton value="Oui" icon="pi pi-check"
+					actionListener="#{usersBean.deleteUser}" process="@this"
+					onclick="PF('deleteProfilDialog').show()"
+					oncomplete="PF('deleteProductDialog').hide()" ajax="true">
+					<f:setPropertyActionListener value="#{venteBean.urlList}"
+						target="#{managerPageBean.page}" />
+				</p:commandButton>
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-button-secondary" icon="pi pi-times"
+					onclick="PF('deleteProductDialog').hide()" />
+			</p:confirmDialog>
+
+		</div>
+	</h:form>
+</ui:composition>
+</html>
+
+

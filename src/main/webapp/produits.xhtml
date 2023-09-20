@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form id="form">
+		<div class="card crud-demo">
+			<p:growl id="messages" showDetail="true" />
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton icon="pi pi-arrow-left" title="Retour"
+						immediate="true"
+						styleClass="edit-button rounded-button ui-button-secondary"
+						update="content" process="manage-ligneVente-content @this"
+						ajax="false" style="margin-right: .5rem">
+						<f:setPropertyActionListener value="#{venteBean.urlList}"
+							target="#{managerPageBean.page}" />
+					</p:commandButton>
+					<p:commandButton title="Nouveau produit" icon="pi pi-plus"
+						actionListener="#{produitBean.openNew}" immediate="true"
+						update=":form:manage-product-content"
+						oncomplete="PF('manageProductDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success"
+						style="margin-right: .5rem">
+						<p:resetInput target=":form:manage-product-content" />
+					</p:commandButton>
+					<p:commandButton id="delete-products-button" immediate="true"
+						title="#{produitBean.deleteButtonMessage}" icon="pi pi-trash"
+						actionListener="#{produitBean.deleteSelectedProduits}"
+						styleClass="edit-button rounded-button ui-button-danger"
+						disabled="#{!produitBean.hasSelectedProduits()}" update="@this">
+						<p:confirm header="Confirmation"
+							message="Voulez vous vraiment supprimer les Produits selectionnés ?"
+							icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:spacer width="100px"></p:spacer>
+					<h3>ESPACE DE GESTION DES PRODUITS</h3>
+				</p:toolbarGroup>
+
+			</p:toolbar>
+			<p:dataTable id="dt-produits" widgetVar="dtProduits" var="produit"
+				value="#{produitBean.produits}" reflow="true"
+				filteredValue="#{produitBean.filtered}"
+				filterBy="#{produitBean.filterBy}"
+				globalFilterOnly="#{produitBean.globalFilterOnly}"
+				styleClass="produits-table"
+				selection="#{produitBean.selectedProduits}" rowKey="#{produit.id}"
+				paginator="true" rows="5" rowSelectMode="add"
+				paginatorPosition="bottom">
+				<f:facet name="header">
+					<div class="products-table-header" align="right">
+						<span style="font-weight: bold">PRODUITS</span> <span
+							class="filter-container ui-input-icon-left"> <i
+							class="pi pi-search"></i> <p:inputText id="globalFilter"
+								onkeyup="PF('dtProduits').filter()" placeholder="Search" />
+						</span>
+
+					</div>
+				</f:facet>
+
+				<p:ajax event="rowSelect" update=":form:delete-products-button" />
+				<p:ajax event="rowUnselect" update=":form:delete-products-button" />
+				<p:ajax event="rowSelectCheckbox"
+					update=":form:delete-products-button" />
+				<p:ajax event="rowUnselectCheckbox"
+					update=":form:delete-products-button" />
+				<p:ajax event="toggleSelect" update=":form:delete-products-button" />
+
+				<p:column selectionMode="multiple" exportable="false"></p:column>
+
+				<p:column headerText="Code" sortBy="#{produit.code}"
+					filterBy="#{produit.code}">
+					<h:outputText value="#{produit.code}" />
+				</p:column>
+				<p:column headerText="Libelle" sortBy="#{produit.libelle}"
+					filterBy="#{produit.libelle}">
+					<h:outputText value="#{produit.libelle}" />
+				</p:column>
+
+
+
+
+
+				<p:column exportable="false">
+					<p:commandButton icon="pi pi-pencil" style="margin-right: .5rem"
+						update=":form:manage-product-content" title="Modifier"
+						oncomplete="PF('manageProductDialog').show()" immediate="true"
+						styleClass="edit-button rounded-button ui-button-success"
+						process="@this">
+						<f:setPropertyActionListener value="#{produit}"
+							target="#{produitBean.selectedProduit}" />
+						<p:resetInput target=":form:manage-product-content" />
+					</p:commandButton>
+					<p:commandButton class="ui-button-warning rounded-button"
+						icon="pi pi-trash" process="@this" title="Supprimer"
+						oncomplete="PF('deleteProductDialog').show()" immediate="true">
+						<f:setPropertyActionListener value="#{produit}"
+							target="#{produitBean.selectedProduit}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+
+			<p:dialog header="Details Produit" showEffect="fade" modal="true"
+				widgetVar="manageProductDialog" responsive="true">
+				<p:outputPanel id="manage-product-content" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty produitBean.selectedProduit}">
+						<div class="p-field">
+							<p:outputLabel for="code">Code</p:outputLabel>
+							<p:inputText id="code"
+								value="#{produitBean.selectedProduit.code}" required="true" />
+							<p:messages id="msgs" />
+						</div>
+						<div class="p-field">
+							<p:outputLabel for="libelle">Libelle</p:outputLabel>
+							<p:inputText id="libelle"
+								value="#{produitBean.selectedProduit.libelle}" />
+						</div>
+
+					</p:outputPanel>
+				</p:outputPanel>
+
+				<f:facet name="footer">
+					<p:commandButton value="Enregistrer" icon="pi pi-check"
+						actionListener="#{produitBean.saveProduit}"
+						update="manage-product-content"
+						process="manage-product-content @this" />
+					<p:commandButton value="Annuler" icon="pi pi-times"
+						onclick="PF('manageProductDialog').hide()" immediate="true"
+						class="ui-button-secondary" />
+				</f:facet>
+			</p:dialog>
+
+			<p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade"
+				width="300" message="Voulez vous vraiment supprimer ce produit?"
+				header="Confirmation" severity="warn">
+				<p:commandButton value="Oui" icon="pi pi-check"
+					actionListener="#{produitBean.deleteProduit}" process="@this"
+					oncomplete="PF('deleteProductDialog').hide()" />
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-button-secondary" icon="pi pi-times"
+					onclick="PF('deleteProductDialog').hide()" />
+			</p:confirmDialog>
+
+			<p:confirmDialog global="true" showEffect="fade" width="300">
+				<p:commandButton value="Oui" type="button"
+					styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-confirmdialog-no ui-button-secondary"
+					icon="pi pi-times" />
+			</p:confirmDialog>
+		</div>
+	</h:form>
+</ui:composition>
+</html>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<f:loadBundle basename="messages" var="myBundle" />
+	<h:form id="formHeader">
+
+
+
+		<p:menubar>
+			<p:submenu label="Operations" icon="pi pi-fw pi-file">
+				<p:divider />
+				<p:menuitem value="#{msg.ventes}" id="itemVentes"
+					partialSubmit="itemVentes" icon="pi pi-fw pi-external-link"
+					action="#{managerPageBean.changePage(venteBean.urlList)}"
+					update="content" />
+				<p:divider />
+				<p:menuitem value="#{msg.achats}" id="itemAchats"
+					partialSubmit="itemAchats" icon="pi pi-fw pi-external-link"
+					action="#{managerPageBean.changePage(achatBean.urlList)}"
+					update="content" />
+			</p:submenu>
+
+			<p:submenu label="Partenaires" icon="pi pi-fw pi-user"
+				rendered="#{authBean.currentUser.role=='admin'}">
+				<p:menuitem value="#{msg.client}" id="itemClients"
+					partialSubmit="itemClient" icon="pi pi-fw pi-align-left"
+					action="#{managerPageBean.changePage(clientBean.urlList)}"
+					update="content" />
+				<p:divider />
+				<p:menuitem value="#{msg.fournisseur}" id="itemFournisseurs"
+					partialSubmit="itemFournisseur" icon="pi pi-fw pi-align-right"
+					action="#{managerPageBean.changePage(fournisseurBean.urlList)}"
+					update="content" />
+			</p:submenu>
+
+			<p:submenu label="Articles" icon=""
+				rendered="#{authBean.currentUser.role=='admin'}">
+				<p:menuitem value="#{msg.produit}" id="itemProduits"
+					partialSubmit="itemProduit" icon=""
+					action="#{managerPageBean.changePage(produitBean.urlList)}"
+					update="content" />
+				<p:menuitem value="#{msg.matierePremiere}" id="itemMatierePremieres"
+					partialSubmit="itemMatierePremiere" icon=""
+					action="#{managerPageBean.changePage(matierePremiereBean.urlList)}"
+					update="content" />
+				<p:menuitem value="#{msg.prixUnitaire}" id="itemprixUnitaire"
+					partialSubmit="itemprixUnitaire" icon=""
+					action="#{managerPageBean.changePage(prixUnitaireBean.urlList)}"
+					update="content" />
+			</p:submenu>
+			
+			<p:submenu label="Vos Statistiques" icon=""
+				rendered="#{authBean.currentUser.role!='admin'}">
+					<p:menuitem value="#{msg.jour}" id="itemJourAg"
+						partialSubmit="itemJourAg" icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListJrByAgCur)}"
+						update="content" />
+					<p:menuitem value="#{msg.mois}" id="itemMoisAg"
+						partialSubmit="itemMoisAg" icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListMoisByAgCur)}"
+						update="content" />
+					<p:menuitem value="#{msg.annee}" id="itemAnneeAg"
+						partialSubmit="itemAnneeAg" icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListAnneeByAgCur)}"
+						update="content" />
+				
+			</p:submenu>
+
+			<p:submenu label="Statistiques" icon=""
+				rendered="#{authBean.currentUser.role=='admin'}">
+				<p:submenu label="Toutes">
+					<p:menuitem value="#{msg.jour}" id="itemJour"
+						partialSubmit="itemJour" icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListJr)}"
+						update="content" />
+					<p:menuitem value="#{msg.mois}" id="itemMois"
+						partialSubmit="itemMois" icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListMois)}"
+						update="content" />
+					<p:menuitem value="#{msg.annee}" id="itemAnnee"
+						partialSubmit="itemAnnee" icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListAnnee)}"
+						update="content" />
+				</p:submenu>
+				<p:submenu label="Par Agent">
+					<p:menuitem value="#{msg.jour}" id="itemJr" partialSubmit="itemJr"
+						icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListJrByUser)}"
+						update="content" />
+					<p:menuitem value="#{msg.mois}" id="itemM" partialSubmit="itemM"
+						icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListMoisByUser)}"
+						update="content" />
+					<p:menuitem value="#{msg.annee}" id="itemA" partialSubmit="itemA"
+						icon=""
+						action="#{managerPageBean.changePage(statistiqueBean.urlListAnneeByUser)}"
+						update="content" />
+				</p:submenu>
+			</p:submenu>
+			<p:submenu label="Administrations" icon="pi pi-fw pi-user"
+				rendered="#{authBean.currentUser.role=='admin'}">
+				<p:menuitem value="#{msg.users}" id="itemUsers"
+					partialSubmit="itemUsers" icon="pi pi-fw pi-user"
+					action="#{managerPageBean.changePage(usersBean.urlList)}"
+					update="content" />
+				<p:menuitem value="#{msg.droitUsers}" id="itemDroitUsers"
+					partialSubmit="itemDroitUsers" icon="pi pi-fw pi-user"
+					action="#{managerPageBean.changePage(usersBean.urlList1)}"
+					update="content" />
+			</p:submenu>
+
+
+
+			<p:divider layout="vertical" />
+			<f:facet name="options">
+				<p:commandButton value="#{authBean.currentUser.username}"
+					title="voir ton profil" icon="pi pi-user"
+					styleClass="ui-button-flat ui-button-plain"
+					style="margin-right: .5rem" process="@this" ajax="false">
+					<f:setPropertyActionListener value="#{usersBean.urlList2}"
+						target="#{managerPageBean.page}" />
+				</p:commandButton>
+
+				<p:commandButton value="Deconnexion" icon="pi pi-power-off"
+					immediate="true" styleClass="ui-confirmdialog-no ui-button-help"
+					process="@this" oncomplete="PF('disconnectDialog').show()"
+					ajax="true">
+					<f:setPropertyActionListener value="#{venteBean.urlList}"
+						target="#{managerPageBean.page}" />
+				</p:commandButton>
+			</f:facet>
+
+		</p:menubar>
+
+
+
+
+
+
+
+
+		<!-- <p:spacer height="2"></p:spacer> -->
+	</h:form>
+
+
+</ui:composition>
+</html>

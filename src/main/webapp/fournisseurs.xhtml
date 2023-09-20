@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+				<h:form id="form">
+					<div class="card crud-demo">
+						<p:growl id="messages" showDetail="true" />
+			<p:toolbar>
+				<p:toolbarGroup>
+				<p:commandButton icon="pi pi-arrow-left" title="Retour"
+						styleClass="edit-button rounded-button ui-button-secondary"
+						update="content" process="manage-ligneVente-content @this"
+						ajax="false" style="margin-right: .5rem">
+						<f:setPropertyActionListener value="#{venteBean.urlList}"
+							target="#{managerPageBean.page}" />
+					</p:commandButton>
+					<p:commandButton title="Nouveau Fournisseur" icon="pi pi-plus"
+						actionListener="#{fournisseurBean.openNew}"
+						update=":form:manage-fournisseur-content"
+						oncomplete="PF('manageFournisseurDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success" style="margin-right: .5rem">
+						<p:resetInput target=":form:manage-fournisseur-content" />
+					</p:commandButton>
+					<p:commandButton id="delete-fournisseurs-button"
+						title="#{fournisseurBean.deleteButtonMessage}" icon="pi pi-trash"
+						actionListener="#{fournisseurBean.deleteSelectedFournisseurs}"
+						styleClass="edit-button rounded-button ui-button-danger"
+						disabled="#{!fournisseurBean.hasSelectedFournisseurs()}"
+						update="@this">
+						<p:confirm header="Confirmation"
+							message="Voulez vous vraiment supprimer les Fournisseurs selectionnés ?"
+							icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:spacer width="100px"></p:spacer>
+					<h3>ESPACE   DE   GESTION    DES   FOURNISSEURS</h3>
+				</p:toolbarGroup>
+				
+			</p:toolbar>
+						<p:dataTable id="dt-fournisseurs" widgetVar="dtFournisseurs" var="fournisseur"
+						filteredValue="#{fournisseurBean.filtered}"
+				filterBy="#{fournisseurBean.filterBy}"
+				globalFilterOnly="#{fournisseurBean.globalFilterOnly}"
+							value="#{fournisseurBean.fournisseurs}" reflow="true"
+							styleClass="fournisseurs-table"
+							selection="#{fournisseurBean.selectedFournisseurs}"
+							rowKey="#{fournisseur.id}" paginator="true" rows="5"
+							rowSelectMode="add" paginatorPosition="bottom">
+							<f:facet name="header">
+								<div class="fournisseurs-table-header" align="right">
+									<span style="font-weight: bold">FOURNISSEURS</span> <span
+										class="filter-container ui-input-icon-left"> <i
+										class="pi pi-search"></i> <p:inputText id="globalFilter"
+											onkeyup="PF('dtFournisseurs').filter()" placeholder="Search" />
+									</span>
+
+								</div>
+							</f:facet>
+
+							<p:ajax event="rowSelect" update=":form:delete-fournisseurs-button" />
+							<p:ajax event="rowUnselect" update=":form:delete-fournisseurs-button" />
+							<p:ajax event="rowSelectCheckbox"
+								update=":form:delete-fournisseurs-button" />
+							<p:ajax event="rowUnselectCheckbox"
+								update=":form:delete-fournisseurs-button" />
+							<p:ajax event="toggleSelect"
+								update=":form:delete-fournisseurs-button" />
+
+							<p:column selectionMode="multiple" exportable="false"></p:column>
+
+							<p:column headerText="Telephone" sortBy="#{fournisseur.telephone}"
+								filterBy="#{fournisseur.telephone}">
+								<h:outputText value="#{fournisseur.telephone}" />
+							</p:column>
+							<p:column headerText="Libelle" sortBy="#{fournisseur.libelle}"
+								filterBy="#{fournisseur.libelle}">
+								<h:outputText value="#{fournisseur.libelle}" />
+							</p:column>
+							<p:column headerText="Type" sortBy="#{fournisseur.type}"
+								filterBy="#{fournisseur.type}">
+								<h:outputText value="#{fournisseur.type}" />
+							</p:column>
+							<p:column headerText="Adresse" sortBy="#{fournisseur.adresse}"
+								filterBy="#{fournisseur.adresse}">
+								<h:outputText value="#{fournisseur.adresse}" />
+							</p:column>
+							<p:column headerText="Compte" sortBy="#{fournisseur.compte}"
+								filterBy="#{fournisseur.compte}">
+								<h:outputText value="#{fournisseur.compte}" />
+							</p:column>
+							
+							<p:column exportable="false">
+								<p:commandButton icon="pi pi-pencil" title="Modifier"
+									update=":form:manage-fournisseur-content"
+									oncomplete="PF('manageFournisseurDialog').show()"
+									styleClass="edit-button rounded-button ui-button-success"
+									process="@this" style="margin-right: .2rem">
+									<f:setPropertyActionListener value="#{fournisseur}"
+										target="#{fournisseurBean.selectedFournisseur}" />
+									<p:resetInput target=":form:manage-fournisseur-content" />
+								</p:commandButton>
+								<p:commandButton class="ui-button-warning rounded-button"
+									icon="pi pi-trash" process="@this" title="Supprimer"
+									oncomplete="PF('deleteFournisseurDialog').show()">
+									<f:setPropertyActionListener value="#{fournisseur}"
+										target="#{fournisseurBean.selectedFournisseur}" />
+								</p:commandButton>
+							</p:column>
+
+						</p:dataTable>
+
+						<p:dialog header="Details Fournisseur" showEffect="fade" modal="true"
+							widgetVar="manageFournisseurDialog" responsive="true">
+							<p:outputPanel id="manage-fournisseur-content" class="ui-fluid">
+								<p:outputPanel
+									rendered="#{not empty fournisseurBean.selectedFournisseur}">
+									<div class="p-grid ui-fluid">
+									<div class="p-field p-col-12 p-md-4">
+										<p:outputLabel for="telephone">Telephone</p:outputLabel>
+										<p:inputText id="telephone"
+											value="#{fournisseurBean.selectedFournisseur.telephone}" required="" />
+									</div>
+									<div class="p-field p-col-12 p-md-4">
+										<p:outputLabel for="libelle">Libelle</p:outputLabel>
+										<p:inputText id="libelle"
+											value="#{fournisseurBean.selectedFournisseur.libelle}" />
+									</div>
+									<div class="p-field p-col-12 p-md-4">
+									<h:outputLabel for="">Type</h:outputLabel>
+										<BR />
+										<p:selectOneMenu converter="#{genericSecuredConverter}"
+											value="#{fournisseurBean.selectedFournisseur.type}">
+											<f:selectItem itemLabel="Physique" itemValue="Physique" />
+                                            <f:selectItem itemLabel="Moral" itemValue="Moral" />
+										</p:selectOneMenu>
+									</div>
+									</div>
+									<div class="p-grid ui-fluid">
+									<div class="p-field p-col-12 p-md-6">
+										<p:outputLabel for="compte">Compte</p:outputLabel>
+										<p:inputText id="compte"
+											value="#{fournisseurBean.selectedFournisseur.compte}" required="" />
+									</div>
+									<div class="p-field p-col-12 p-md-6">
+										<p:outputLabel for="adresse">Adresse</p:outputLabel>
+										<p:inputText id="adresse"
+											value="#{fournisseurBean.selectedFournisseur.adresse}" />
+									</div>
+									</div>
+									
+								</p:outputPanel>
+							</p:outputPanel>
+
+							<f:facet name="footer">
+								<p:commandButton value="Enregistrer" icon="pi pi-check"
+									actionListener="#{fournisseurBean.saveFournisseur}"
+									update="manage-fournisseur-content"
+									process="manage-fournisseur-content @this" />
+								<p:commandButton value="Annuler" icon="pi pi-times" 
+									onclick="PF('manageFournisseurDialog').hide()"
+									class="ui-button-secondary" />
+							</f:facet>
+						</p:dialog>
+
+						<p:confirmDialog widgetVar="deleteFournisseurDialog" showEffect="fade"
+							width="300" message="Voulez vous vraiment supprimer ce fournisseur?"
+							header="Confirmation" severity="warn">
+							<p:commandButton value="Oui" icon="pi pi-check"
+								actionListener="#{fournisseurBean.deleteFournisseur}" process="@this"
+								oncomplete="PF('deleteFournisseurDialog').hide()" />
+							<p:commandButton value="Non" type="button"
+								styleClass="ui-button-secondary" icon="pi pi-times"
+								onclick="PF('deleteFournisseurDialog').hide()" />
+						</p:confirmDialog>
+
+						<p:confirmDialog global="true" showEffect="fade" width="300">
+							<p:commandButton value="Oui" type="button"
+								styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+							<p:commandButton value="Non" type="button"
+								styleClass="ui-confirmdialog-no ui-button-secondary"
+								icon="pi pi-times" />
+						</p:confirmDialog>
+					</div>
+				</h:form>
+			</ui:composition>
+</html>

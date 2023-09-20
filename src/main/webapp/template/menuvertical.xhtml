@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form>
+		<p:growl>
+			<p:autoUpdate />
+		</p:growl>
+		<p:panelMenu style="width:300px">
+			<p:submenu label="Les Ventes de : #{authBean.currentUser.username} ">
+				<p:submenu label="Aujourd'hui  ( #{venteBean.getVenteJourCourantAgent(authBean.currentUser).date.date}-
+				 #{venteBean.getVenteJourCourantAgent(authBean.currentUser).date.month+1}-
+				 #{venteBean.getVenteJourCourantAgent(authBean.currentUser).date.year+1900})">
+					<p:menuitem
+						value="Nombre Ventes :  #{venteBean.getVenteJourCourantAgent(authBean.currentUser).nombreVente}" />
+					<p:menuitem
+						value="Montant :  #{venteBean.getVenteJourCourantAgent(authBean.currentUser).montant}" />
+				</p:submenu>
+
+				<p:submenu label="Mois en cours ( #{venteBean.getVenteMoisCourantAgent(authBean.currentUser).mois} )">
+					<p:menuitem
+						value="Nombre Ventes :  #{venteBean.getVenteMoisCourantAgent(authBean.currentUser).nombreVente}" />
+					<p:menuitem
+						value="Montant :  #{venteBean.getVenteMoisCourantAgent(authBean.currentUser).montant}" />
+				</p:submenu>
+
+				<p:submenu label="Annee en cours ( #{venteBean.getVenteAnneeCourantAgent(authBean.currentUser).annee} )">
+					<p:menuitem
+						value="Nombre Vente :  #{venteBean.getVenteAnneeCourantAgent(authBean.currentUser).nombreVente}" />
+					<p:menuitem
+						value="Montant :  #{venteBean.getVenteAnneeCourantAgent(authBean.currentUser).montant}" />
+				</p:submenu>
+			</p:submenu>
+		</p:panelMenu>
+	</h:form>
+</ui:composition>
+</html>

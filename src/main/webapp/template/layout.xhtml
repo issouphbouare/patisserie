@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<f:view locale="#{localeManagerBean.locale}">
+	<h:head>
+		<h:outputStylesheet library="webjars"
+			name="primeflex/2.0.0/primeflex.min.css" />
+		<h:outputStylesheet library="css" name="messtyles.css" />
+
+		<title><ui:insert name="title">
+				<h:outputText value="My Application" />
+			</ui:insert></title>
+	</h:head>
+	<body class="contenu">
+		<h:panelGroup id="allContent">
+			<div class="row">
+				<div class="p-d-flex">
+					<div class="p-mr-2">
+						<ui:insert name="menuvertical">
+							<ui:include src="/template/menuvertical.xhtml" />
+						</ui:insert>
+					</div>
+
+					<div class="p-mr-2">
+						<ui:insert name="header">
+							<ui:include src="/template/header.xhtml" />
+						</ui:insert>
+						<h:panelGroup id="content" class="contenu">
+							<ui:insert name="content">
+							</ui:insert>
+						</h:panelGroup>
+					</div>
+				</div>
+
+
+
+
+
+				<h:form id="formPoppup">
+					<p:ajaxStatus onstart="PF('statusDialog').show()"
+						onsuccess="PF('statusDialog').hide()" />
+					<p:dialog widgetVar="statusDialog" modal="false" draggable="false"
+						closable="false" resizable="false" showHeader="false"
+						position="right,bottom">
+						<h:graphicImage library="images" name="load.gif" width="50" />
+					</p:dialog>
+
+
+					<p:dialog header="Details Profil" showEffect="fade" modal="true"
+						widgetVar="manageProfilDialog" responsive="true">
+						<p:outputPanel id="manage-profil-content" class="ui-fluid">
+							<p:outputPanel rendered="#{not empty authBean.currentUser}">
+
+								<div class="p-field">
+									<p:outputLabel>Identifiant</p:outputLabel>
+									<p:inputText value="#{authBean.currentUser.username}"
+										disabled="true" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel>Telephone</p:outputLabel>
+									<p:inputText value="#{authBean.currentUser.telephone}"
+										disabled="true" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel>Email</p:outputLabel>
+									<p:inputText value="#{authBean.currentUser.email}"
+										disabled="true" />
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Acces</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{authBean.currentUser.enabled}">
+										<f:selectItem itemLabel="false" itemValue="false" />
+										<f:selectItem itemLabel="true" itemValue="true" />
+									</p:selectOneMenu>
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Role</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{authBean.currentUser.role}">
+										<f:selectItem itemLabel="agent" itemValue="agent" />
+										<f:selectItem itemLabel="admin" itemValue="admin" />
+									</p:selectOneMenu>
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel>Mot de passe</p:outputLabel>
+									<p:inputText type="password"
+										value="#{authBean.currentUser.password}" required="" />
+								</div>
+								<div class="p-field">
+									<p:commandLink value="Modifier le mot de passe"
+										onclick="PF('manageProfilDialog').hide()" process="@this"
+										oncomplete="PF('manageModifierPasswordDialog').show()" />
+								</div>
+							</p:outputPanel>
+						</p:outputPanel>
+
+						<f:facet name="footer">
+							<p:commandButton value="Modifier le profil" icon="pi pi-pencil"
+								update="manage-profil-content"
+								actionListener="#{usersBean.profilCourant(authBean.currentUser)}"
+								onclick="PF('manageProfilDialog').hide()"
+								oncomplete="PF('manageModifierDialog').show()" process="@this">
+								<f:setPropertyActionListener value="#{authBean.currentUser}"
+									target="#{usersBean.selectedUser}" />
+							</p:commandButton>
+							<p:commandButton value="Annuler" icon="pi pi-times"
+								onclick="PF('manageProfilDialog').hide()" immediate="true"
+								class="ui-button-secondary" />
+						</f:facet>
+					</p:dialog>
+
+					<p:dialog header="Modifier profil" showEffect="fade" modal="true"
+						widgetVar="manageModifierDialog" responsive="true">
+						<p:outputPanel id="manage-modifier-content" class="ui-fluid">
+							<p:outputPanel rendered="#{not empty usersBean.selectedUser}">
+
+								<div class="p-field">
+									<p:outputLabel for="username">Identifiant</p:outputLabel>
+									<p:inputText id="username"
+										value="#{usersBean.selectedUser.username}" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="telephone">Telephone</p:outputLabel>
+									<p:inputText id="telephone"
+										value="#{usersBean.selectedUser.telephone}" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="email">Email</p:outputLabel>
+									<p:inputText id="email" value="#{usersBean.selectedUser.email}" />
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Acces</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{usersBean.selectedUser.enabled}">
+										<f:selectItem itemLabel="false" itemValue="false" />
+										<f:selectItem itemLabel="true" itemValue="true" />
+									</p:selectOneMenu>
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Role</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{usersBean.selectedUser.role}">
+										<f:selectItem itemLabel="agent" itemValue="agent" />
+										<f:selectItem itemLabel="admin" itemValue="admin" />
+									</p:selectOneMenu>
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="password">Mot de passe</p:outputLabel>
+									<p:inputText id="password" type="password"
+										value="#{usersBean.selectedUser.password}" required="" />
+								</div>
+							</p:outputPanel>
+						</p:outputPanel>
+
+						<f:facet name="footer">
+							<p:commandButton value="Enregistrer" icon="pi pi-check"
+								actionListener="#{usersBean.saveUser}"
+								onclick="PF('manageModifierDialog').hide()"
+								oncomplete="PF('editProfilDialog').show()"
+								update="manage-modifier-content"
+								process="manage-modifier-content @this" />
+							<p:commandButton value="Annuler" icon="pi pi-times"
+								onclick="PF('manageModifierDialog').hide()" immediate="true"
+								class="ui-button-secondary" />
+						</f:facet>
+					</p:dialog>
+
+					<p:dialog header="Modifier le mot de passe" showEffect="fade"
+						modal="true" widgetVar="manageModifierPasswordDialog22"
+						responsive="true">
+						<p:outputPanel id="manage-modifierPassword-content"
+							class="ui-fluid">
+							<p:outputPanel rendered="#{not empty usersBean.selectedUser}">
+
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="username1">Identifiant</p:outputLabel>
+									<p:inputText id="username1"
+										value="#{usersBean.selectedUser.username}" />
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="telephone1">Telephone</p:outputLabel>
+									<p:inputText id="telephone1"
+										value="#{usersBean.selectedUser.telephone}" />
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="email1">Email</p:outputLabel>
+									<p:inputText id="email1"
+										value="#{usersBean.selectedUser.email}" />
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Acces</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{usersBean.selectedUser.enabled}">
+										<f:selectItem itemLabel="false" itemValue="false" />
+										<f:selectItem itemLabel="true" itemValue="true" />
+									</p:selectOneMenu>
+								</div>
+
+								<div class="p-field" hidden="true">
+									<h:outputLabel for="">Role</h:outputLabel>
+									<BR />
+									<p:selectOneMenu value="#{usersBean.selectedUser.role}">
+										<f:selectItem itemLabel="agent" itemValue="agent" />
+										<f:selectItem itemLabel="admin" itemValue="admin" />
+									</p:selectOneMenu>
+								</div>
+								<div class="p-field" hidden="true">
+									<p:outputLabel for="password1">Mot de passe</p:outputLabel>
+									<p:inputText id="password1" type="password"
+										value="#{usersBean.selectedUser.password}" required="" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="password2">Ancien mot de passe</p:outputLabel>
+									<p:inputText id="password2" type="password" value=""
+										required="" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="password3">Nouveau mot de passe</p:outputLabel>
+									<p:inputText id="password3" type="password" value=""
+										required="" />
+								</div>
+								<div class="p-field">
+									<p:outputLabel for="password4">Confirmation de mot de passe</p:outputLabel>
+									<p:inputText id="password4" type="password" value=""
+										required="" />
+								</div>
+							</p:outputPanel>
+						</p:outputPanel>
+
+						<f:facet name="footer">
+							<p:commandButton value="Enregistrer" icon="pi pi-check"
+								actionListener="#{usersBean.saveUser}"
+								onclick="PF('manageModifierDialog').hide()"
+								oncomplete="PF('editProfilPasswordDialog').show()"
+								update="manage-modifierPassword-content"
+								process="manage-modifierPassword-content @this" />
+							<p:commandButton value="Annuler" icon="pi pi-times"
+								onclick="PF('manageModifierPasswordDialog').hide()"
+								immediate="true" class="ui-button-secondary" />
+						</f:facet>
+					</p:dialog>
+
+
+					<!-- Les boites de confirmations -->
+
+					<p:confirmDialog widgetVar="disconnectDialog" showEffect="fade"
+						closable="false" width="300"
+						message="Voulez vous vraiment te deconnecter ?"
+						header="Confirmation" severity="warn">
+						<p:button value="Oui" href="/logout"
+							styleClass="ui-confirmdialog-no ui-button-primary"
+							icon="pi pi-check" />
+						<p:commandButton value="Non" type="button"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-times" onclick="PF('disconnectDialog').hide()" />
+					</p:confirmDialog>
+
+					<p:confirmDialog widgetVar="editProfilDialog" showEffect="fade"
+						closable="false" width="300" message="Profil modifié avec succes "
+						header="Confirmation" severity="warn">
+						<p:commandButton value="Ok" type="button"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" onclick="PF('editProfilDialog').hide()" />
+					</p:confirmDialog>
+
+					<p:confirmDialog widgetVar="editLoginDialog" showEffect="fade"
+						closable="false" width="300" message="Profil modifié avec succes "
+						header="Confirmation" severity="warn">
+						<p:button value="Ok" href="/logout"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" />
+					</p:confirmDialog>
+
+					<p:confirmDialog widgetVar="editPasswordDialog" showEffect="fade"
+						closable="false" width="300" message="Mot de passe changé avec succes "
+						header="Confirmation" severity="warn">
+						<p:button value="Ok" href="/logout"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" />
+					</p:confirmDialog>
+
+					<p:confirmDialog widgetVar="deleteProfilDialog" showEffect="fade"
+						closable="false" width="300"
+						message="Compte supprimé avec succes " header="Confirmation"
+						severity="warn">
+						<p:button value="Ok" href="/logout"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" />
+
+					</p:confirmDialog>
+					<p:confirmDialog widgetVar="deleteUserDialog" showEffect="fade"
+						closable="false" width="300"
+						message="Compte supprimé avec succes " header="Confirmation"
+						severity="warn">
+						<p:commandButton value="Ok" type="button"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" onclick="PF('deleteUserDialog').hide()" />
+					</p:confirmDialog>
+
+					<p:confirmDialog widgetVar="errorNewConfirmDialog"
+						showEffect="fade" closable="false" width="300"
+						message="Nouveau mot de passe et confirmation differents ! "
+						header="Confirmation" severity="warn">
+						<p:commandButton value="Ok" type="button"
+							
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" onclick="PF('errorNewConfirmDialog').hide()"
+							oncomplete="PF('manageModifierPasswordDialog').show()">
+							
+						</p:commandButton>
+					</p:confirmDialog>
+
+					<p:confirmDialog widgetVar="errorLastPasswordDialog"
+						showEffect="fade" closable="false" width="300"
+						message="Ancien mot de passe incorreect ! " header="Confirmation"
+						severity="warn">
+						<p:commandButton value="Ok" type="button"
+							update=":form:manage-modifierPassword-content"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" onclick="PF('errorLastPasswordDialog').hide()"
+							oncomplete="PF('manageModifierPasswordDialog').show()">
+							<p:resetInput target=":form:manage-modifierPassword-content" />
+						</p:commandButton>
+					</p:confirmDialog>
+
+					<p:confirmDialog widgetVar="errorPasswordDialog" showEffect="fade"
+						closable="false" width="300"
+						message="Ancien mot de passe incorrect et nouveau mot de passe different du confirmation  ! "
+						header="Confirmation" severity="warn">
+						<p:commandButton value="Ok" type="button"
+							update=":form:manage-modifierPassword-content"
+							styleClass="ui-confirmdialog-no ui-button-secondary"
+							icon="pi pi-check" onclick="PF('errorPasswordDialog').hide()"
+							oncomplete="PF('manageModifierPasswordDialog').show()">
+							<p:resetInput target=":form:manage-modifierPassword-content" />
+						</p:commandButton>
+					</p:confirmDialog>
+
+
+				</h:form>
+			</div>
+		</h:panelGroup>
+
+	</body>
+</f:view>
+</html>

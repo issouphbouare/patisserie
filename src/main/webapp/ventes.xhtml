@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form id="form">
+		<div class="card crud-demo">
+			<p:growl id="messages" showDetail="true" />
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton title="Nouvelle vente" icon="pi pi-plus"
+						actionListener="#{venteBean.openNew}"
+						update=":form:manage-vente-content"
+						oncomplete="PF('manageVenteDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success"
+						style="margin-right: .5rem">
+						<p:resetInput target=":form:manage-vente-content" />
+					</p:commandButton>
+					<p:commandButton id="delete-ventes-button"
+						title="#{venteBean.deleteButtonMessage}" icon="pi pi-trash"
+						actionListener="#{venteBean.deleteSelectedVentes}"
+						styleClass="edit-button rounded-button ui-button-danger"
+						disabled="#{!venteBean.hasSelectedVentes()}" update="@this">
+						<p:confirm header="Confirmation"
+							message="Voulez vous vraiment supprimer les Ventes selectionnés ?"
+							icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:spacer width="100px"></p:spacer>
+					<h3>ESPACE VENTES</h3>
+				</p:toolbarGroup>
+
+			</p:toolbar>
+
+			<p:dataTable id="dt-ventes" widgetVar="dtVentes" var="vente"
+				value="#{venteBean.getVenteByUser(authBean.currentUser)}"
+				reflow="true" styleClass="ventes-table"
+				selection="#{venteBean.selectedVentes}" rowKey="#{vente.id}"
+				filteredValue="#{venteBean.filtered}"
+				filterBy="#{venteBean.filterBy}"
+				globalFilterOnly="#{venteBean.globalFilterOnly}" paginator="true"
+				rows="6" rowSelectMode="add" paginatorPosition="bottom">
+				<f:facet name="header">
+
+					<div class="ventes-table-header" align="right">
+
+						<span style="font-weight: bold">VENTES </span> <span
+							class="filter-container ui-input-icon-left"> <i
+							class="pi pi-search"></i> <p:inputText id="globalFilter"
+								onkeyup="PF('dtVentes').filter()" placeholder="Search" />
+						</span>
+
+					</div>
+				</f:facet>
+
+				<p:ajax event="rowSelect" update=":form:delete-ventes-button" />
+				<p:ajax event="rowUnselect" update=":form:delete-ventes-button" />
+				<p:ajax event="rowSelectCheckbox"
+					update=":form:delete-ventes-button" />
+				<p:ajax event="rowUnselectCheckbox"
+					update=":form:delete-ventes-button" />
+				<p:ajax event="toggleSelect" update=":form:delete-ventes-button" />
+
+				<p:column selectionMode="multiple" exportable="false" />
+
+				<p:column headerText="Numéro" sortBy="#{vente.id}"
+					filterBy="#{vente.id}" sortOrder="desc">
+					<h:outputText value="Vente N°#{vente.id}" />
+				</p:column>
+				<p:column headerText="Date" sortBy="#{vente.dateVente}"
+					filterBy="#{vente.dateVente}" >
+					<h:outputText value="#{vente.dateVente}" />
+				</p:column>
+				<p:column headerText="Agent" sortBy="#{vente.users.username}"
+					filterBy="#{vente.users.username}">
+					<h:outputText value="#{vente.users.username}" />
+				</p:column>
+				<p:column headerText="Client" sortBy="#{vente.client.nomClient}"
+					filterBy="#{vente.client.nomClient}">
+					<h:outputText value="#{vente.client.nomClient}" />
+				</p:column>
+				<p:column headerText="montant" sortBy="#{vente.montant}"
+					filterBy="#{vente.montant}">
+					<h:outputText value="#{vente.montant}">
+						<f:convertNumber type="number" />
+					</h:outputText>
+				</p:column>
+
+				<p:column exportable="false">
+					<p:commandButton icon="pi pi-file-pdf"
+						title="Details et exporter en pdf" style="margin-right: .2rem"
+						actionListener="#{venteBean.details(vente)}" update="content"
+						styleClass="edit-button rounded-button ui-button-primary"
+						process="@this" ajax="false">
+						<f:setPropertyActionListener value="#{venteBean.urlList2}"
+							target="#{managerPageBean.page}" />
+						<f:setPropertyActionListener value="#{vente}"
+							target="#{venteBean.selectedVente}" />
+					</p:commandButton>
+					<p:commandButton icon="pi pi-pencil" title="Modifier"
+						disabled="#{authBean.currentUser.id!=vente.users.id}"
+						update=":form:manage-vente-content" style="margin-right: .2rem"
+						oncomplete="PF('manageVenteDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success"
+						process="@this">
+						<f:setPropertyActionListener value="#{vente}"
+							target="#{venteBean.selectedVente}" />
+						<p:resetInput target=":form:manage-vente-content" />
+					</p:commandButton>
+					<p:commandButton class="ui-button-warning rounded-button"
+						icon="pi pi-trash" process="@this" title="Supprimer"
+						oncomplete="PF('deleteVenteDialog').show()">
+						<f:setPropertyActionListener value="#{vente}"
+							target="#{venteBean.selectedVente}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+			<p:dialog header="Details Vente" showEffect="fade" modal="true"
+				widgetVar="manageVenteDialog" responsive="true">
+				<p:outputPanel id="manage-vente-content" class="ui-fluid">
+					<p:outputPanel rendered="#{not empty venteBean.selectedVente}">
+						<div class="p-field">
+							<h:outputLabel for="">Client</h:outputLabel>
+							<BR />
+							<p:selectOneMenu converter="#{genericSecuredConverter}"
+								value="#{venteBean.selectedVente.client}">
+								<f:selectItems value="#{clientBean.clients}" var="client"
+									itemLabel="#{client.nomClient}" itemValue="#{client}" />
+							</p:selectOneMenu>
+						</div>
+
+					</p:outputPanel>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Ajouter ou modifier des Commandes"
+						icon="pi pi-check" actionListener="#{venteBean.saveVente}"
+						update="content" process="manage-vente-content @this" ajax="false">
+						<f:setPropertyActionListener value="#{venteBean.urlList1}"
+							target="#{managerPageBean.page}" />
+					</p:commandButton>
+					<p:commandButton value="Annuler" icon="pi pi-times"
+						immediate="true" onclick="PF('manageVenteDialog').hide()"
+						class="ui-button-secondary" />
+				</f:facet>
+			</p:dialog>
+
+			<p:confirmDialog widgetVar="deleteVenteDialog" showEffect="fade"
+				width="300" message="Voulez vous vraiment supprimer cette vente?"
+				header="Confirmation" severity="warn">
+				<p:commandButton value="Oui" icon="pi pi-check"
+					actionListener="#{venteBean.deleteVente}" process="@this"
+					oncomplete="PF('deleteVenteDialog').hide()" />
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-button-secondary" icon="pi pi-times"
+					onclick="PF('deleteVenteDialog').hide()" />
+			</p:confirmDialog>
+
+			<p:confirmDialog global="true" showEffect="fade" width="300">
+				<p:commandButton value="Oui" type="button"
+					styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-confirmdialog-no ui-button-secondary"
+					icon="pi pi-times" />
+			</p:confirmDialog>
+		</div>
+	</h:form>
+
+</ui:composition>
+</html>

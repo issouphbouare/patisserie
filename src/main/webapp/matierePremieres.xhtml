@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+				<h:form id="form">
+					<div class="card crud-demo">
+						<p:growl id="messages" showDetail="true" />
+			<p:toolbar>
+				<p:toolbarGroup>
+				<p:commandButton icon="pi pi-arrow-left" title="Retour"
+						styleClass="edit-button rounded-button ui-button-secondary"
+						update="content" process="manage-ligneVente-content @this"
+						ajax="false" style="margin-right: .5rem">
+						<f:setPropertyActionListener value="#{venteBean.urlList}"
+							target="#{managerPageBean.page}" />
+					</p:commandButton>
+					<p:commandButton  icon="pi pi-plus" title="nouvelle Matiere Premiere"
+						actionListener="#{matierePremiereBean.openNew}"
+						update=":form:manage-matierePremiere-content"
+						oncomplete="PF('manageMatierePremiereDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success" style="margin-right: .5rem">
+						<p:resetInput target=":form:manage-matierePremiere-content" />
+					</p:commandButton>
+					<p:commandButton id="delete-matierePremieres-button" 
+						title="#{matierePremiereBean.deleteButtonMessage}" icon="pi pi-trash"
+						actionListener="#{matierePremiereBean.deleteSelectedMatierePremieres}"
+						styleClass="edit-button rounded-button ui-button-danger"
+						disabled="#{!matierePremiereBean.hasSelectedMatierePremieres()}"
+						update="@this">
+						<p:confirm header="Confirmation"
+							message="Voulez vous vraiment supprimer les MatierePremieres selectionnés ?"
+							icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:spacer width="100px"></p:spacer>
+					<h3>ESPACE   DE   GESTION    DES   MATIERES PREMIERES</h3>
+				</p:toolbarGroup>
+				
+			</p:toolbar>
+			<p:dataTable id="dt-matierePremieres" widgetVar="dtMatierePremieres"
+				var="matierePremiere"
+				filteredValue="#{matierePremiereBean.filtered}"
+				filterBy="#{matierePremiereBean.filterBy}"
+				globalFilterOnly="#{matierePremiereBean.globalFilterOnly}"
+				value="#{matierePremiereBean.matierePremieres}" reflow="true"
+				styleClass="matierePremieres-table"
+				selection="#{matierePremiereBean.selectedMatierePremieres}"
+				rowKey="#{matierePremiere.id}" paginator="true" rows="5"
+				rowSelectMode="add" paginatorPosition="bottom">
+				<f:facet name="header">
+					<div class="matierePremieres-table-header" align="right">
+						<span style="font-weight: bold">MATIERES PREMIERES</span> <span
+							class="filter-container ui-input-icon-left"> <i
+							class="pi pi-search"></i> <p:inputText id="globalFilter"
+								onkeyup="PF('dtMatierePremieres').filter()" placeholder="Search" />
+						</span>
+
+					</div>
+				</f:facet>
+
+				<p:ajax event="rowSelect"
+					update=":form:delete-matierePremieres-button" />
+				<p:ajax event="rowUnselect"
+					update=":form:delete-matierePremieres-button" />
+				<p:ajax event="rowSelectCheckbox"
+					update=":form:delete-matierePremieres-button" />
+				<p:ajax event="rowUnselectCheckbox"
+					update=":form:delete-matierePremieres-button" />
+				<p:ajax event="toggleSelect"
+					update=":form:delete-matierePremieres-button" />
+
+				<p:column selectionMode="multiple" exportable="false"></p:column>
+
+				<p:column headerText="Libelle" sortBy="#{matierePremiere.libelle}"
+					filterBy="#{matierePremiere.libelle}">
+					<h:outputText value="#{matierePremiere.libelle}" />
+				</p:column>
+				<p:column headerText="Type" sortBy="#{matierePremiere.type}"
+					filterBy="#{matierePremiere.type}">
+					<h:outputText value="#{matierePremiere.type}" />
+				</p:column>
+
+				<p:column exportable="false">
+					<p:commandButton icon="pi pi-pencil" title="Modifier"
+						update=":form:manage-matierePremiere-content"
+						style="margin-right: .2rem"
+						oncomplete="PF('manageMatierePremiereDialog').show()"
+						styleClass="edit-button rounded-button ui-button-success"
+						process="@this">
+						<f:setPropertyActionListener value="#{matierePremiere}"
+							target="#{matierePremiereBean.selectedMatierePremiere}" />
+						<p:resetInput target=":form:manage-matierePremiere-content" />
+					</p:commandButton>
+					<p:commandButton class="ui-button-warning rounded-button"
+						icon="pi pi-trash" process="@this" title="Supprimer"
+						oncomplete="PF('deleteMatierePremiereDialog').show()">
+						<f:setPropertyActionListener value="#{matierePremiere}"
+							target="#{matierePremiereBean.selectedMatierePremiere}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+
+			<p:dialog header="Details MatierePremiere" showEffect="fade" modal="true"
+							widgetVar="manageMatierePremiereDialog" responsive="true">
+							<p:outputPanel id="manage-matierePremiere-content" class="ui-fluid">
+								<p:outputPanel
+									rendered="#{not empty matierePremiereBean.selectedMatierePremiere}">
+									<div class="p-grid ui-fluid">
+									<div class="p-field p-col-12 p-md-6">
+										<p:outputLabel for="libelle">Libelle</p:outputLabel>
+										<p:inputText id="libelle"
+											value="#{matierePremiereBean.selectedMatierePremiere.libelle}" />
+									</div>
+									<div class="p-field p-col-12 p-md-6">
+									<h:outputLabel for="">Type</h:outputLabel>
+										<BR />
+										<p:selectOneMenu converter="#{genericSecuredConverter}"
+											value="#{matierePremiereBean.selectedMatierePremiere.type}">
+											<f:selectItem itemLabel="Produit Premiere" itemValue="Produit Premiere" />
+                                            <f:selectItem itemLabel="Produit Consommable" itemValue="Produit Consommable" />
+                                            <f:selectItem itemLabel="Autre" itemValue="Autre" />
+										</p:selectOneMenu>
+									</div>
+									</div>
+									
+								</p:outputPanel>
+							</p:outputPanel>
+
+							<f:facet name="footer">
+								<p:commandButton value="Enregistrer" icon="pi pi-check"
+									actionListener="#{matierePremiereBean.saveMatierePremiere}"
+									update="manage-matierePremiere-content"
+									process="manage-matierePremiere-content @this" />
+								<p:commandButton value="Annuler" icon="pi pi-times" 
+									onclick="PF('manageMatierePremiereDialog').hide()"
+									class="ui-button-secondary" />
+							</f:facet>
+						</p:dialog>
+
+						<p:confirmDialog widgetVar="deleteMatierePremiereDialog" showEffect="fade"
+							width="300" message="Voulez vous vraiment supprimer ce matierePremiere?"
+							header="Confirmation" severity="warn">
+							<p:commandButton value="Oui" icon="pi pi-check"
+								actionListener="#{matierePremiereBean.deleteMatierePremiere}" process="@this"
+								oncomplete="PF('deleteMatierePremiereDialog').hide()" />
+							<p:commandButton value="Non" type="button"
+								styleClass="ui-button-secondary" icon="pi pi-times"
+								onclick="PF('deleteMatierePremiereDialog').hide()" />
+						</p:confirmDialog>
+
+						<p:confirmDialog global="true" showEffect="fade" width="300">
+							<p:commandButton value="Oui" type="button"
+								styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+							<p:commandButton value="Non" type="button"
+								styleClass="ui-confirmdialog-no ui-button-secondary"
+								icon="pi pi-times" />
+						</p:confirmDialog>
+					</div>
+				</h:form>
+			</ui:composition>
+</html>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+
+
+
+
+	<h:form id="form">
+		<p:toolbar>
+			<p:toolbarGroup>
+				<p:commandButton icon="pi pi-arrow-left" title="Retour"
+					style="margin-right: .5rem"
+					styleClass="edit-button rounded-button ui-button-secondary"
+					update="content">
+					<f:setPropertyActionListener value="#{venteBean.urlList}"
+						target="#{managerPageBean.page}" />
+				</p:commandButton>
+				<p:commandButton title="Exporter en Pdf" icon="pi pi-file-pdf"
+					styleClass="edit-button rounded-button">
+					<p:dataExporter type="pdf" target="dt-ligneVentes"
+						fileName="facture" preProcessor="#{exportBean.preProcessPDF}" />
+				</p:commandButton>
+
+				<p:spacer width="100px" />
+				<h3>ESPACE EXPORTATION DES FACTURES DE VENTES</h3>
+			</p:toolbarGroup>
+		</p:toolbar>
+
+		<div class="card crud-demo">
+
+			<p:dataTable id="dt-ligneVentes" widgetVar="dtLigneVentes"
+				cellSeparator=""
+				style="border-collapse: collapse; border: medium solid black; width:100%; page-break-before:always "
+				var="ligneVente" value="#{venteBean.ligneVentes}" reflow="true"
+				styleClass="ligneVentes-table" rowKey="#{ligneVente.id}">
+				<f:facet name="header">
+					<div class="p-grid ui-fluid">
+						<div class="p-field p-col-12 p-md-10" hidden="true">
+							<p:outputLabel
+								value="Client_#{venteBean.venteCourant.client.nomClient}                                            Date_#{venteBean.venteCourant.dateVente}  
+					                   Caisse_#{venteBean.venteCourant.users.username}                                              Vente_#{venteBean.venteCourant.id}" />
+						</div>
+						
+						<div class="p-field p-col-12 p-md-10">
+							<p:outputLabel value="Client: #{venteBean.venteCourant.client.nomClient}" />
+						</div>
+						<div class="p-field p-col-12 p-md-2">
+							<p:outputLabel value="Date : Date_#{venteBean.venteCourant.dateVente}" />
+						</div>
+						<div class="p-field p-col-12 p-md-10">
+							<p:outputLabel value="Caisse_de : #{venteBean.venteCourant.users.username}" />
+						</div>
+						<div class="p-field p-col-12 p-md-2">
+							<p:outputLabel value="Vente N° #{venteBean.venteCourant.id}" />
+						</div>
+						
+					</div>
+
+				</f:facet>
+
+				<p:column headerText="Designation"
+					style="border: thin solid black; page-break-before:always">
+					<h:outputText value="#{ligneVente.produit.libelle}" />
+				</p:column>
+				<p:column headerText="Prix Unitaire"
+					style="border: solid 1px black;">
+					<h:outputText value="#{ligneVente.prixUnitaire.prix}">
+						<f:convertNumber type="number" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Quantite"
+					style="border: thin solid black; page-break-before:always">
+					<h:outputText value="#{ligneVente.quantite}">
+						<f:convertNumber type="number" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Montant"
+					style="border: thin solid black; page-break-before:always">
+					<h:outputText value="#{ligneVente.montant}">
+						<f:convertNumber type="number" />
+					</h:outputText>
+				</p:column>
+
+
+
+				<f:facet name="footer">
+
+					<p:spacer />
+					<div class="p-grid ui-fluid">
+						<div class="p-field p-col-12 p-md-10" hidden="true">
+							<p:outputLabel
+								value="Montant_total_#{venteBean.venteCourant.montant}     Reglement_espece_#{venteBean.espece}     Rendu_#{venteBean.espece-venteBean.venteCourant.montant}" />
+						</div>
+						<div class="p-field p-col-12 p-md-2">
+							<p:outputLabel value="Montant Total :" />
+						</div>
+						<div class="p-field p-col-12 p-md-2">
+							<p:inputNumber id="montant"
+								value="#{venteBean.venteCourant.montant}" disabled="true" />
+						</div>
+					</div>
+					<div class="p-grid ui-fluid">
+						<div class="p-field p-col-12 p-md-2">
+							<p:outputLabel value="Reglement Espece" />
+						</div>
+						<div class="p-field p-col-12 p-md-2">
+							<p:inputText id="espece" value="#{venteBean.espece}"
+								style="border-color:green; height:25px;">
+								<p:ajax event="input" update="rendu" />
+							</p:inputText>
+						</div>
+					</div>
+					<div class="p-grid ui-fluid">
+						<div class="p-field p-col-12 p-md-2">
+							<p:outputLabel value="Rendu" />
+						</div>
+						<div class="p-field p-col-12 p-md-2">
+							<p:inputNumber id="rendu"
+								value="#{venteBean.espece-venteBean.venteCourant.montant}"
+								disabled="true" />
+						</div>
+					</div>
+				</f:facet>
+
+			</p:dataTable>
+
+
+
+		</div>
+	</h:form>
+
+</ui:composition>
+</html>

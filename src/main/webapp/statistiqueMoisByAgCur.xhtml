@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+	<h:form id="form">
+		<div class="card crud-demo">
+			<p:growl id="messages" showDetail="true" />
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton icon="pi pi-arrow-left" title="Retour"
+						immediate="true"
+						styleClass="edit-button rounded-button ui-button-secondary"
+						update="content" process="manage-ligneVente-content @this"
+						ajax="false" style="margin-right: .5rem">
+						<f:setPropertyActionListener value="#{venteBean.urlList}"
+							target="#{managerPageBean.page}" />
+					</p:commandButton>
+					<p:commandButton title="Exporter en Pdf" icon="pi pi-file-pdf"
+						styleClass="edit-button rounded-button">
+						<p:dataExporter type="pdf" target="dt-statistiquesMoisAgCur"
+							fileName="facture" preProcessor="#{exportBean.preProcessPDF}" />
+					</p:commandButton>
+
+					<p:spacer width="100px"></p:spacer>
+					<h3>VOS STATISTIQUES MENSUELLES </h3>
+				</p:toolbarGroup>
+
+			</p:toolbar>
+			<p:dataTable id="dt-statistiquesMoisAgCur" widgetVar="dtStatistiquesMois"
+				var="venteMois" value="#{statistiqueBean.statistiqueMoisAgCur(authBean.currentUser)}" reflow="true"
+				filteredValue="#{statistiqueBean.filteredMoisAgCur}"
+				filterBy="#{statistiqueBean.filterBy}"
+				globalFilterOnly="#{statistiqueBean.globalFilterOnly}"
+				styleClass="statistiquesMoisAgCur-table" rowKey="#{venteMois.id}"
+				paginator="true" rows="10" rowSelectMode="add"
+				paginatorPosition="bottom">
+				<f:facet name="header">
+					<div hidden="true">
+						<h:outputLabel
+							value="Bilan _Mensuelles_de_#{authBean.currentUser.username}" />
+					</div>
+					<div class="products-table-header" align="right">
+						<span style="font-weight: bold">MOIS </span> <span
+							class="filter-container ui-input-icon-left"> <i
+							class="pi pi-search"></i> <p:inputText id="globalFilter"
+								value="#{statistiqueBean.mois}" placeholder="Search" type="month"
+								onchange="PF('dtStatistiquesMois').filter()" />
+						</span>
+					</div>
+				</f:facet>
+
+				<p:column headerText="Annee" sortBy="#{venteMois.date}"
+					filterBy="#{venteMois.date}" sortOrder="desc">
+					<h:outputText value="#{venteMois.date}">
+						<f:convertDateTime pattern="yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Mois" sortBy="#{venteMois.date}"
+					filterBy="#{venteMois.date}" sortOrder="desc">
+					<h:outputText value="#{venteMois.date}">
+						<f:convertDateTime pattern="MM" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Agent" sortBy="#{venteMois.users.username}"
+					filterBy="#{venteMois.users.username}">
+					<h:outputText value="#{venteMois.users.username}" />
+				</p:column>
+				<p:column headerText="Nombre Vente" sortBy="#{venteMois.nombreVente}"
+					filterBy="#{venteMois.nombreVente}">
+					<h:outputText value="#{venteMois.nombreVente}" />
+				</p:column>
+				<p:column headerText="Montant Vente" sortBy="#{venteMois.montantVente}"
+					filterBy="#{venteMois.montantVente}">
+					<h:outputText value="#{venteMois.montantVente}" />
+				</p:column>
+				<p:column headerText="Montant Achat" sortBy="#{venteMois.montantAchat}"
+					filterBy="#{venteMois.montantAchat}">
+					<h:outputText value="#{venteMois.montantAchat}" />
+				</p:column>
+				<p:column headerText="Bilan" sortBy="#{venteMois.bilan}"
+					filterBy="#{venteMois.bilan}">
+					<h:outputText value="#{venteMois.bilan}" />
+				</p:column>
+
+			</p:dataTable>
+
+
+		</div>
+	</h:form>
+</ui:composition>
+</html>
